@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  fastapi:
+    container_name: fastapi-container
+    build:
+      context: ./backend/main-api/fastapi
+    ports:
+      - "8005:80"
+    volumes:
+      - ./backend/main-api/fastapi:/app
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    env_file:
+      - ./backend/main-api/fastapi/.fastapi_env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgresdb:
+    image: postgres:17
+    container_name: postgres-db
+    restart: always
+    ports:
+      - "5532:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - ./backend/main-api/fastapi/.fastapi_env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  adminer:
+    image: adminer
+    container_name: fastapi-adminer
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+
+volumes:
+  pgdata:

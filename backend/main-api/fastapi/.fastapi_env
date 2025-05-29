@@ -1,0 +1,6 @@
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=fastapi_db
+POSTGRES_HOST=postgresdb
+POSTGRES_PORT=5432
+DATABASE_URL=postgresql://postgres:postgres@postgresdb:5432/fastapi_db
